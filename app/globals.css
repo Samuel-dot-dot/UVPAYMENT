@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #05010b;
+  --foreground: #f8fafc;
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    min-height: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    background-color: var(--background);
+    background-image: radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.25), transparent 45%),
+      radial-gradient(circle at 80% 0%, rgba(79, 70, 229, 0.2), transparent 40%),
+      radial-gradient(circle at 50% 80%, rgba(15, 23, 42, 0.6), transparent 60%);
+    color: var(--foreground);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background: rgba(124, 58, 237, 0.45);
+    color: #fff;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(124, 58, 237, 0.75) rgba(255, 255, 255, 0.08);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(124, 58, 237, 0.75);
+    border-radius: 9999px;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+  }
+
+  .noir-surface {
+    background: rgba(8, 3, 18, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .glow-ring {
+    box-shadow: 0 0 45px rgba(124, 58, 237, 0.35);
+  }
+}
