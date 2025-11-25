@@ -33,16 +33,8 @@ export const authOptions: NextAuthOptions = {
       console.log('User Name:', user?.name);
       console.log('Discord ID:', (profile as any)?.id || account?.providerAccountId);
 
-      // Timeout wrapper to prevent infinite hangs
-      const timeoutPromise = new Promise<boolean>((resolve) => {
-        setTimeout(() => {
-          console.error('\n⏰ SIGN-IN CALLBACK TIMEOUT! Forcing success after 5 seconds.');
-          resolve(true);
-        }, 5000); // 5 second timeout
-      });
-
-      const signInPromise = (async () => {
-        // Try to save to database but don't block login if it fails
+      // Save to database in background without blocking login
+      (async () => {
         try {
         const discordId = (profile as any)?.id?.toString() ?? account?.providerAccountId ?? '';
         const email = user.email ?? (profile as Record<string, any>)?.email?.toString();
@@ -148,22 +140,20 @@ export const authOptions: NextAuthOptions = {
             console.log('New Profile Data:', JSON.stringify(insertData, null, 2));
           }
         }
-      } catch (error) {
-        console.error('\n❌ EXCEPTION CAUGHT IN SIGN-IN CALLBACK!');
-        console.error('Exception:', error);
-        if (error instanceof Error) {
-          console.error('Error Message:', error.message);
-          console.error('Error Stack:', error.stack);
+        } catch (error) {
+          console.error('\n❌ EXCEPTION CAUGHT IN SIGN-IN CALLBACK!');
+          console.error('Exception:', error);
+          if (error instanceof Error) {
+            console.error('Error Message:', error.message);
+            console.error('Error Stack:', error.stack);
+          }
         }
-      }
-
-        console.log('\n✅ Login approved for:', user?.email);
-        console.log('========== 🔵 SIGN-IN CALLBACK END ==========\n');
-        return true;
       })();
 
-      // Race between actual sign-in and timeout
-      return Promise.race([signInPromise, timeoutPromise]);
+      // Always allow sign in immediately
+      console.log('\n✅ Login approved for:', user?.email);
+      console.log('========== 🔵 SIGN-IN CALLBACK END ==========\n');
+      return true;
     },
     async jwt({ token, user, account }) {
       console.log('\n========== 🟡 JWT CALLBACK START ==========');
