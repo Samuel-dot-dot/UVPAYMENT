@@ -2,10 +2,6 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabase';
 
-// Route segment config for raw body handling (required for Stripe webhooks)
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not configured');
 }
