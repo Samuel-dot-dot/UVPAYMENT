@@ -2,20 +2,24 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabase';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not configured');
-}
-
-if (!process.env.STRIPE_WEBHOOK_SECRET) {
-  throw new Error('STRIPE_WEBHOOK_SECRET is not configured');
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
-});
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2023-10-16',
+    })
+  : null;
 
 export async function POST(req: Request) {
   console.log('\n========== 🔔 WEBHOOK REQUEST RECEIVED ==========');
+
+  if (!stripe) {
+    console.error('❌ Stripe not configured');
+    return new NextResponse('Stripe not configured', { status: 500 });
+  }
+
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error('❌ Stripe webhook secret not configured');
+    return new NextResponse('Stripe webhook secret not configured', { status: 500 });
+  }
 
   const body = await req.text();
   const signature = req.headers.get('stripe-signature');
@@ -32,7 +36,7 @@ export async function POST(req: Request) {
 
   try {
     console.log('🔐 Verifying webhook signature...');
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
     console.log('✅ Signature verified successfully!');
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';

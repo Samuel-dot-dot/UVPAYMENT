@@ -4,20 +4,22 @@ import Stripe from 'stripe';
 import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not configured');
-}
-
-if (!process.env.STRIPE_PRODUCT_ID) {
-  throw new Error('STRIPE_PRODUCT_ID is not configured');
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
-});
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2023-10-16',
+    })
+  : null;
 
 export async function POST(req: NextRequest) {
   try {
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+    }
+
+    if (!process.env.STRIPE_PRODUCT_ID) {
+      return NextResponse.json({ error: 'Stripe product not configured' }, { status: 500 });
+    }
+
     // Get the user session
     const session = await getServerSession(authOptions);
 
