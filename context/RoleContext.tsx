@@ -1,1 +1,1 @@
-﻿export { RoleProvider, useRole } from '../app/providers';
+﻿export { Providers as RoleProvider, useRole } from '../app/providers';

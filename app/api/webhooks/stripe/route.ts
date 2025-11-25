@@ -2,11 +2,9 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabase';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Route segment config for raw body handling (required for Stripe webhooks)
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not configured');
@@ -76,7 +74,7 @@ export async function POST(req: Request) {
       console.log(`\n📝 Updating user ${userId} to subscriber...`);
 
       // First check if the profile exists
-      const { data: existingProfile, error: checkError } = await supabaseAdmin
+      const { data: existingProfile, error: checkError } = await (supabaseAdmin as any)
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -88,7 +86,7 @@ export async function POST(req: Request) {
 
         // Try to find by stripe_customer_id as fallback
         console.log('🔄 Trying to find user by stripe_customer_id...');
-        const { data: fallbackProfile, error: fallbackError } = await supabaseAdmin
+        const { data: fallbackProfile, error: fallbackError } = await (supabaseAdmin as any)
           .from('profiles')
           .select('*')
           .eq('stripe_customer_id', customerId)
@@ -97,7 +95,7 @@ export async function POST(req: Request) {
         if (!fallbackError && fallbackProfile) {
           console.log('✅ Found user by customer ID!');
           // Update using customer ID
-          const { data: updatedData, error: updateError } = await supabaseAdmin
+          const { data: updatedData, error: updateError } = await (supabaseAdmin as any)
             .from('profiles')
             .update({
               role: 'subscriber',
@@ -119,10 +117,10 @@ export async function POST(req: Request) {
         return new NextResponse('User not found', { status: 500 });
       }
 
-      console.log('✅ User found:', existingProfile.id);
+      console.log('✅ User found:', (existingProfile as any).id);
 
       // Upgrade user to subscriber
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await (supabaseAdmin as any)
         .from('profiles')
         .update({
           role: 'subscriber',
@@ -156,7 +154,7 @@ export async function POST(req: Request) {
       }
 
       // Downgrade user to guest
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('profiles')
         .update({
           role: 'guest',
@@ -193,7 +191,7 @@ export async function POST(req: Request) {
         role = 'guest';
       }
 
-      const { error } = await supabaseAdmin
+      const { error } = await (supabaseAdmin as any)
         .from('profiles')
         .update({
           role,

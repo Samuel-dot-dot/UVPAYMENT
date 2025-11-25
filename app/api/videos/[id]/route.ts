@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 
 // DELETE /api/videos/[id]
@@ -31,7 +31,7 @@ export async function DELETE(
     }
 
     // First, get the video to retrieve the file URLs
-    const { data: video, error: fetchError } = await supabaseAdmin
+    const { data: video, error: fetchError } = await (supabaseAdmin as any)
       .from('videos')
       .select('video_url, thumbnail_url')
       .eq('id', id)
@@ -42,9 +42,9 @@ export async function DELETE(
     }
 
     // Extract filenames from URLs and delete files from storage
-    if (video.video_url) {
+    if ((video as any).video_url) {
       try {
-        const videoPath = video.video_url.split('/').pop();
+        const videoPath = (video as any).video_url.split('/').pop();
         if (videoPath) {
           console.log('Deleting video file:', videoPath);
           const { error: videoDeleteError } = await supabaseAdmin.storage
@@ -60,9 +60,9 @@ export async function DELETE(
       }
     }
 
-    if (video.thumbnail_url) {
+    if ((video as any).thumbnail_url) {
       try {
-        const thumbnailPath = video.thumbnail_url.split('/').pop();
+        const thumbnailPath = (video as any).thumbnail_url.split('/').pop();
         if (thumbnailPath) {
           console.log('Deleting thumbnail file:', thumbnailPath);
           const { error: thumbnailDeleteError } = await supabaseAdmin.storage
@@ -79,7 +79,7 @@ export async function DELETE(
     }
 
     // Delete the video record from the database
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await (supabaseAdmin as any)
       .from('videos')
       .delete()
       .eq('id', id);
@@ -132,7 +132,7 @@ export async function PATCH(
     }
 
     // Update the video in the database
-    const { data: updatedVideo, error: updateError } = await supabaseAdmin
+    const { data: updatedVideo, error: updateError } = await (supabaseAdmin as any)
       .from('videos')
       .update({
         title: title.trim(),

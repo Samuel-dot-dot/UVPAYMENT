@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 
 // Helper function to convert Google Drive sharing link to direct/embed link
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       console.log('Processed video URL:', processedVideoUrl);
 
       // Insert link metadata into database
-      const { data: dbData, error: dbError } = await supabaseAdmin
+      const { data: dbData, error: dbError } = await (supabaseAdmin as any)
         .from('videos')
         .insert({
           title: title.trim(),
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
     console.log('Thumbnail URL:', thumbnailUrl);
 
     // Insert video metadata into database
-    const { data: dbData, error: dbError } = await supabaseAdmin
+    const { data: dbData, error: dbError } = await (supabaseAdmin as any)
       .from('videos')
       .insert({
         title,

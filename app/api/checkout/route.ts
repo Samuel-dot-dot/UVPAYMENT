@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import Stripe from 'stripe';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user already has a Stripe customer ID
-    const { data: profile, error: profileError } = await supabaseAdmin
+    const { data: profile, error: profileError } = await (supabaseAdmin as any)
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', session.user.id)
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
-    let customerId: string | undefined = profile?.stripe_customer_id ?? undefined;
+    let customerId: string | undefined = (profile as any)?.stripe_customer_id ?? undefined;
 
     // Create Stripe customer if one doesn't exist
     if (!customerId) {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       customerId = customer.id;
 
       // Save the customer ID to the database
-      const { error: updateError } = await supabaseAdmin
+      const { error: updateError } = await (supabaseAdmin as any)
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', session.user.id);

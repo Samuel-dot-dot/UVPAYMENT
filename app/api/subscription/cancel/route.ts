@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabase';
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's stripe_customer_id from database
-    const { data: profile, error: profileError } = await supabaseAdmin
+    const { data: profile, error: profileError } = await (supabaseAdmin as any)
       .from('profiles')
       .select('stripe_customer_id, role')
       .eq('id', session.user.id)
@@ -32,17 +32,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
     }
 
-    if (profile.role !== 'subscriber') {
+    if ((profile as any).role !== 'subscriber') {
       return NextResponse.json({ error: 'No active subscription' }, { status: 400 });
     }
 
-    if (!profile.stripe_customer_id) {
+    if (!(profile as any).stripe_customer_id) {
       return NextResponse.json({ error: 'No Stripe customer ID found' }, { status: 400 });
     }
 
     // Find active subscription for this customer
     const subscriptions = await stripe.subscriptions.list({
-      customer: profile.stripe_customer_id,
+      customer: (profile as any).stripe_customer_id,
       status: 'active',
       limit: 1,
     });

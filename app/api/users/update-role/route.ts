@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
@@ -39,25 +39,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Prevent modifying owner accounts
-    const { data: targetUser } = await supabaseAdmin
+    const { data: targetUser } = await (supabaseAdmin as any)
       .from('profiles')
       .select('role')
       .eq('id', userId)
       .single();
 
-    if (targetUser?.role === 'owner') {
+    if ((targetUser as any)?.role === 'owner') {
       return NextResponse.json({
         error: 'Cannot modify owner accounts'
       }, { status: 403 });
     }
 
     // Update the user's role
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await (supabaseAdmin as any)
       .from('profiles')
       .update({
         role,
         // Update subscription status when changing role
-        subscription_status: role === 'subscriber' ? 'active' : (role === 'guest' ? 'inactive' : targetUser?.role === 'subscriber' ? 'active' : 'inactive')
+        subscription_status: role === 'subscriber' ? 'active' : (role === 'guest' ? 'inactive' : (targetUser as any)?.role === 'subscriber' ? 'active' : 'inactive')
       })
       .eq('id', userId)
       .select()
