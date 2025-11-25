@@ -36,9 +36,9 @@ export const authOptions: NextAuthOptions = {
       // Timeout wrapper to prevent infinite hangs
       const timeoutPromise = new Promise<boolean>((resolve) => {
         setTimeout(() => {
-          console.error('\n⏰ SIGN-IN CALLBACK TIMEOUT! Forcing success after 10 seconds.');
+          console.error('\n⏰ SIGN-IN CALLBACK TIMEOUT! Forcing success after 5 seconds.');
           resolve(true);
-        }, 10000); // 10 second timeout
+        }, 5000); // 5 second timeout
       });
 
       const signInPromise = (async () => {
@@ -55,6 +55,8 @@ export const authOptions: NextAuthOptions = {
         console.log('  - Username:', username);
         console.log('  - Avatar URL:', avatarUrl);
         console.log('  - Supabase Admin Ready?', !!supabaseAdmin);
+        console.log('  - Supabase URL set?', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+        console.log('  - Supabase Service Key set?', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
         console.log('  - OWNER_DISCORD_ID from env:', OWNER_DISCORD_ID);
 
         if (!discordId) {

@@ -12,7 +12,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
 
 // Admin client (for server-side operations requiring elevated privileges)
 // This should ONLY be used in API routes and server components
-export const supabaseAdmin = supabaseServiceRoleKey
+export const supabaseAdmin = supabaseUrl && supabaseServiceRoleKey
   ? createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
       auth: {
         autoRefreshToken: false,
