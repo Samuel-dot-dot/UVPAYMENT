@@ -1,9 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/api/webhooks/stripe/route": "app/api/webhooks/stripe/route.js",
-  "/api/subscription/cancel/route": "app/api/subscription/cancel/route.js",
-  "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js",
-  "/(protected)/profile/page": "app/(protected)/profile/page.js",
-  "/(protected)/pricing/page": "app/(protected)/pricing/page.js"
-}
