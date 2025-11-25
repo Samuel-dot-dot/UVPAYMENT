@@ -3,25 +3,13 @@ import DiscordProvider from 'next-auth/providers/discord';
 import { supabaseAdmin } from '@/lib/supabase';
 import type { Profile } from '@/types_db';
 
-// Helper to ensure environment variables are set
-const ensureEnv = (value: string | undefined, name: string): string => {
-  if (!value) {
-    throw new Error(`Environment variable ${name} is not set`);
-  }
-  return value;
-};
-
 // Required environment variables
-const DISCORD_CLIENT_ID = ensureEnv(process.env.DISCORD_CLIENT_ID, 'DISCORD_CLIENT_ID');
-const DISCORD_CLIENT_SECRET = ensureEnv(process.env.DISCORD_CLIENT_SECRET, 'DISCORD_CLIENT_SECRET');
-const NEXTAUTH_SECRET = ensureEnv(process.env.NEXTAUTH_SECRET, 'NEXTAUTH_SECRET');
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
+const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || '';
 
 // Optional: Owner Discord ID for God Mode
 const OWNER_DISCORD_ID = process.env.OWNER_DISCORD_ID || '';
-
-if (!supabaseAdmin) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
-}
 
 export const authOptions: NextAuthOptions = {
   secret: NEXTAUTH_SECRET,
