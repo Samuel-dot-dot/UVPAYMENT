@@ -45,6 +45,21 @@ export async function POST(req: NextRequest) {
 
     let customerId: string | undefined = (profile as any)?.stripe_customer_id ?? undefined;
 
+    // Verify customer exists in Stripe, or create new one
+    if (customerId) {
+      try {
+        // Check if customer exists in Stripe
+        await stripe.customers.retrieve(customerId);
+      } catch (err: any) {
+        if (err.code === 'resource_missing') {
+          console.log('Customer not found in Stripe, creating new one');
+          customerId = undefined; // Will create new customer below
+        } else {
+          throw err; // Re-throw other errors
+        }
+      }
+    }
+
     // Create Stripe customer if one doesn't exist
     if (!customerId) {
       const customer = await stripe.customers.create({
